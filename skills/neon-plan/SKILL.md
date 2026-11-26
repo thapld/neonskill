@@ -29,8 +29,8 @@ Plan before coding following `AGENTS.md` (or `NEON.md`) rules (recommended model
      - *One focused side task* (research, test run) → `invoke_subagent`.
      - *Single cohesive feature / sequential work* → `neon-slice`.
      - *One hard bug, race condition, or deep refactor* → recommend `/boost <task>`.
-     - *Wide work across disjoint files (same repo)* → recommend `/swarm <task>`, or run `neon-teamwork` when isolated worktrees/ports/DBs are needed in T3 Code.
-     - *Multi-milestone project (hours–days)* → recommend `/teamwork <goal>`.
+     - *Wide work across disjoint files (same repo)* → recommend `/swarm <task>`, or run `neon-teamwork` when isolated worktrees/ports/DBs are needed (via T3 Code `delegate_task` or Orca `orchestration`).
+     - *Multi-milestone project (hours–days)* → recommend `/teamwork <goal>` (in Antigravity) or `neon-teamwork` Orca Orchestration mode (in Orca).
 5. **Write `SPEC.md`** at the repo root (or feature folder if the repo uses one; in `CHAT MODE`, output `SPEC.md` in chat) containing:
    - **Goal**: 1–2 sentences describing the exact outcome.
    - **Codebase Map (≤10 lines) & Top 3 Riskiest Files (`path:line`)**.

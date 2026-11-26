@@ -18,3 +18,5 @@ Preserve momentum across context resets or quota limits following `AGENTS.md` (o
    - **Blockers & Next Fix** *(if any)*: what failed (command/error summary) and the next concrete fix or `SPEC.md` assumption to revisit.
    - **Next 3 commands**: exact commands/prompts to resume after `/clear` or quota reset (starting from `AGENTS.md`/`NEON.md` + `DECISIONS.md` + `HANDOFF.md`).
 4. **Keep it concise** so the next session resumes immediately without re-reading full history.
+5. **Orca full handoff** *(when transferring ownership completely to another Orca agent/worktree without waiting for results)*:
+   - Follow `orca-cli` Full Handoffs: launch `ORCA worktree create --name <task> --no-parent --agent <id> --prompt "<brief>" --json` (or `ORCA orchestration send --to <handle> --type handoff --subject "<topic>" --body-file <file> --json` for an already-running agent) and stop once delivery is confirmed. Never use `task-create` for one-way handoffs.

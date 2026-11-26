@@ -24,7 +24,8 @@ Implement a single slice following `AGENTS.md` (or `NEON.md`) rules (recommended
 3. **Verify in the current worktree**:
    - Write or update tests covering new behavior and edge cases.
    - Run `<TEST_CMD>` in the thread's worktree.
-   - If the slice touches UI/frontend: run headless/CLI E2E checks via `<TEST_CMD>`. Run live browser checks (`preview_*` / `/browser`: main flow, 0 console errors, no desktop/mobile horizontal overflow) **only** when requested by the user or explicitly approved in `SPEC.md` Test Plan.
+   - If the slice touches UI/frontend: run headless/CLI E2E checks via `<TEST_CMD>`. Run live browser checks (`preview_*` / `/browser` in T3 Code & Antigravity, or `orca-cli` `tab create`/`snapshot`/`screenshot` in Orca: main flow, 0 console errors, no desktop/mobile horizontal overflow) **only** when requested by the user or explicitly approved in `SPEC.md` Test Plan.
+   - If inside an **Orca-managed worktree**, update the workspace card at key checkpoints (non-fatal if unavailable): `orca worktree set --worktree active --comment "<status>" --json` (and use `orca ports --json` for dev-server port checks).
 4. **Stop rules & failure modes**:
    - **Success**: `<TEST_CMD>` passes with new tests covering the change.
    - **Stuck loop**: raise thinking level or summarize failed attempts into a concise hint (never send `thinking_budget` or adjust `temperature`).

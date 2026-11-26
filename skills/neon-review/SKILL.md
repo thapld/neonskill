@@ -17,7 +17,8 @@ Audit the real diff following `AGENTS.md` (or `NEON.md`) rules in a fresh thread
    - Audit for `TODO`s, placeholder stubs, violations of `What We Will NOT Do` or `DECISIONS.md`, logic bugs, edge cases, race conditions, security/secret leaks, and DB/transaction issues.
 3. **Run independent verification**:
    - Run `<TEST_CMD>` (plus typecheck/lint if configured) in the current worktree and capture actual output (at least the **last 20 lines**; note explicitly if truncated).
-   - If UI/frontend changed: run headless/CLI E2E checks via `<TEST_CMD>`. Run live browser verification (`preview_*` / `/browser`: main flow, 0 console errors, no desktop/mobile horizontal overflow) **only** when requested by the user or explicitly approved in `SPEC.md` Test Plan.
+   - If UI/frontend changed: run headless/CLI E2E checks via `<TEST_CMD>`. Run live browser verification (`preview_*` / `/browser` in T3 Code & Antigravity, or `orca-cli` `snapshot`/`screenshot` in Orca: main flow, 0 console errors, no desktop/mobile horizontal overflow) **only** when requested by the user or explicitly approved in `SPEC.md` Test Plan.
+   - In an **Orca** workspace, you may mark the workspace `in-review` (`orca worktree set --worktree active --workspace-status in-review --json`) after posting findings.
 4. **Output format**:
    - Exact verification command(s) + **pasted actual output** (≥ last 20 lines).
    - List **numbered findings** with:
