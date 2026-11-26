@@ -13,16 +13,20 @@ Coordinate parallel or large-scale `SPEC.md` execution (recommended coordinator:
 2. Pick the right execution engine for the shape of `SPEC.md`:
    - **Long multi-milestone project (hours–days, multiple milestones/phases)**: Do **not** force into manual `delegate_task` waves. Output a ready-to-paste Antigravity `/teamwork` command so the user invokes Antigravity's sentinel + orchestrator + critic/challenger/auditor gates:
      `/teamwork <goal> — follow SPEC.md and AGENTS.md`
-   - **Wide parallel work inside Antigravity (shared board, same provider)**: When the user requests swarm mode or `delegate_task` is unavailable, use Antigravity's native `swarm` tool (`workspace: "share"` when edits may overlap, named workers on `gemini-4-hydrogen`, plus a read-only `@verifier` on `gemini-4-neon`), or suggest `/swarm <task>`.
+   - **Wide parallel work via Antigravity native `swarm`**: Only when the user asks for `/swarm` or swarm mode (or when running natively in Antigravity outside T3 Code — never silently fall back from `delegate_task` in T3 Code), follow `native_swarm` rules:
+     - Leave `model` unset so workers inherit your model unless the user explicitly requests another model (e.g., a different model for `@verifier`).
+     - Give editing authors `workspace: "share"` and require them to commit before posting `[done]`; keep read-only `@verifier` on `workspace: "inherit"`.
+     - Coordinator never writes code; remember board tools arrive one turn after the first `swarm add`; **always land/merge a worker's commit BEFORE calling `kill`** (`kill` permanently deletes its workspace).
    - **Isolated parallel worktrees in T3 Code (separate branches/ports/DBs or cross-provider Claude/Codex)**: Continue with the `delegate_task` (`isolation: "worktree"`) workflow below.
 3. Check slice boundaries in `SPEC.md`:
    - Parallel slices **must** touch disjoint files (and use distinct ports/DBs when running services).
    - Serialize overlapping or schema/API-dependent slices into sequential waves.
 4. **Phase 0 (Read-only Discovery, optional for large/unfamiliar repos)**:
-   - Dispatch read-only `research` subagents to verify file boundaries and `path:line` assumptions before spawning write workers.
+   - Dispatch read-only `research` subagents to verify file boundaries and return a **ranked summary with `path:line` for every finding** before spawning write workers.
 5. Call `orchestrator_capabilities` once to read actual available providers, models, and option keys/values (never hardcode unavailable options or switch providers unasked).
-6. **Cost Guard**:
+6. **Cost Guard & Batch Approvals**:
    - Warn the user before launching a wide parallel wave (4–5x quota burn) or `XHIGH` fan-out, and suggest checking `/usage` before long runs.
+   - Collect non-urgent items requiring user approval (paid installs, migrations, pushes, destructive actions) into **one batch list** instead of interrupting repeatedly.
 
 ## 2. Spawn Parallel Slice Workers (T3 Code Worktree Mode)
 For each independent slice in the current wave, launch `delegate_task` with:

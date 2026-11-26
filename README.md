@@ -31,9 +31,9 @@ neon-init  ──▶  neon-plan (Explore + Adaptive Grill / /grill-me + Mode Rou
 ```bash
 npx github:thapld/neonskill
 ```
-Hoặc dùng đầy đủ URL GitHub:
+Hoặc dùng URL `git+https`:
 ```bash
-npx https://github.com/thapld/neonskill.git --global
+npx git+https://github.com/thapld/neonskill.git --global
 ```
 *(Cài toàn bộ 8 skill vào `~/.gemini/config/skills/neon-*`.)*
 
@@ -41,7 +41,7 @@ npx https://github.com/thapld/neonskill.git --global
 ```bash
 npx github:thapld/neonskill --project
 ```
-Hoặc chỉ định đường dẫn repo:
+Hoặc chỉ định đường dẫn repo (hỗ trợ cả `--project <dir>` lẫn `--project=<dir>`):
 ```bash
 npx github:thapld/neonskill --project /duong/dan/toi/repo
 ```
@@ -50,8 +50,10 @@ npx github:thapld/neonskill --project /duong/dan/toi/repo
 ### 3. Các tùy chọn `npx` khác
 ```bash
 npx github:thapld/neonskill --list                       # Liệt kê 8 skill
-npx github:thapld/neonskill --only neon-init,neon-plan   # Chỉ cài vài skill cụ thể
+npx github:thapld/neonskill --only=neon-init,neon-plan   # Chỉ cài vài skill cụ thể
 npx github:thapld/neonskill --dry-run --project          # Xem trước đường dẫn cài, không ghi file
+npx github:thapld/neonskill --uninstall                  # Gỡ các skill neon-* đã cài (global)
+npx github:thapld/neonskill --uninstall --project        # Gỡ các skill neon-* khỏi project hiện tại
 ```
 
 ### 4. Cách cài bằng `install.sh` (nếu bạn clone repo)
@@ -119,8 +121,11 @@ Chạy neon-ship để hoàn thiện docs và mở Draft PR.
 ```
 Lọc `HANDOFF.md` khỏi commit, cập nhật `README.md` + 3-line `CHANGELOG.md`, push nhánh, mở Draft PR kèm output test thật, sau đó gợi ý tùy chọn `IMPROVE` (1 cải tiến cho `AGENTS.md`) và `ITERATE` (3 ý tưởng v2).
 
-### Bước 6: Bảo toàn trạng thái (`neon-handoff`)
-Khi gần chạm **512K context** trên Antigravity app hoặc giới hạn 5 giờ/tuần: ưu tiên `/compact`; nếu cần reset sạch thì chạy `neon-handoff` ở thread chính để ghi `HANDOFF.md`, sau đó `/clear` và nạp lại từ `AGENTS.md` + `DECISIONS.md` + `HANDOFF.md`.
+### Bước 6: Bảo toàn trạng thái (`neon-handoff`) & Mẹo vận hành thực chiến
+* Khi gần chạm **512K context** trên Antigravity app hoặc giới hạn 5 giờ/tuần: ưu tiên `/compact`; nếu cần reset sạch thì chạy `neon-handoff` ở thread chính để ghi `HANDOFF.md`, sau đó `/clear` và nạp lại từ `AGENTS.md` + `DECISIONS.md` + `HANDOFF.md`.
+* **Daily driver:** Khi chạy `neon-slice` thường ngày trên Antigravity, có thể chọn model **`Orchestrator (Neon)`** (Neon lập kế hoạch/review, Hydrogen thực thi nhanh & tiết kiệm quota).
+* **Hỏi nhanh không bẩn context:** Dùng **`/btw <câu hỏi>`** để tra cứu bên lề trong lúc agent chính đang chạy.
+* **Kiểm soát quota:** Kiểm tra `/usage` trước khi chạy wave song song lớn và đặt **`AI Credit Overages → Never`** để hệ thống chờ refresh thay vì tiêu thêm credit ngoài ý muốn.
 
 ---
 

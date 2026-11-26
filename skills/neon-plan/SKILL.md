@@ -24,14 +24,14 @@ Plan before coding following `AGENTS.md` (or `NEON.md`) rules (recommended model
    - **Quick Grill**: 1 round (3–5 sharp questions) for well-scoped features.
    - **Deep Grill**: multiple decision-tree rounds for large/ambiguous work (or recommend `/grill-me` when deep interactive alignment is needed).
 4. **Lock decisions & pick execution mode**:
-   - After user answers arrive, append locked decisions to `DECISIONS.md` (one line each).
+   - After user answers arrive, append locked decisions to `DECISIONS.md` (create if missing; in `CHAT MODE`, output the entries in chat instead of writing files).
    - Match the mode to the problem shape (note: agent cannot execute slash commands directly — recommend them for the user to invoke):
      - *One focused side task* (research, test run) → `invoke_subagent`.
      - *Single cohesive feature / sequential work* → `neon-slice`.
      - *One hard bug, race condition, or deep refactor* → recommend `/boost <task>`.
      - *Wide work across disjoint files (same repo)* → recommend `/swarm <task>`, or run `neon-teamwork` when isolated worktrees/ports/DBs are needed in T3 Code.
      - *Multi-milestone project (hours–days)* → recommend `/teamwork <goal>`.
-5. **Write `SPEC.md`** at the repo root (or feature folder if the repo uses one) containing:
+5. **Write `SPEC.md`** at the repo root (or feature folder if the repo uses one; in `CHAT MODE`, output `SPEC.md` in chat) containing:
    - **Goal**: 1–2 sentences describing the exact outcome.
    - **Codebase Map (≤10 lines) & Top 3 Riskiest Files (`path:line`)**.
    - **Files Touched**: explicit create/modify list.

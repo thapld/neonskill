@@ -27,11 +27,11 @@ Implement a single slice following `AGENTS.md` (or `NEON.md`) rules (recommended
    - If the slice touches UI/frontend: run headless/CLI E2E checks via `<TEST_CMD>`. Run live browser checks (`preview_*` / `/browser`: main flow, 0 console errors, no desktop/mobile horizontal overflow) **only** when requested by the user or explicitly approved in `SPEC.md` Test Plan.
 4. **Stop rules & failure modes**:
    - **Success**: `<TEST_CMD>` passes with new tests covering the change.
-   - **Stuck loop**: raise thinking level or summarize failed attempts into a concise hint (never adjust `temperature`).
+   - **Stuck loop**: raise thinking level or summarize failed attempts into a concise hint (never send `thinking_budget` or adjust `temperature`).
    - **Oscillating** (bouncing between 2 approaches): stop immediately, list both attempts, and ask.
    - **Edit-from-here** (resumed in a fresh session): restate the short plan before editing.
    - **Hard bug / 2-strike escalation → `/boost`**: On deep bugs (race conditions, tricky algorithms, complex refactors) or after 2 consecutive identical failures, stop patching blindly, report `what failed` + `next fix`, and output a ready-to-paste Antigravity `/boost` command:
      `/boost Fix <bug summary> at <file:line>; repro: <repro>; verify with <TEST_CMD>`
    - **Single-writer `HANDOFF.md`**: parallel slice workers must never edit `HANDOFF.md` — return blockers in `RETURN` so the coordinator owns `HANDOFF.md`.
 5. **Return**:
-   - Changed files (`file:line`), **actual pasted test output** (at least the last 20 lines, never summarized), and any blockers or open doubts.
+   - Changed files (`file:line`), **actual pasted test output** (at least the last 20 lines, never summarized; state explicitly if output was truncated), and any blockers or open doubts.

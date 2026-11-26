@@ -7,9 +7,9 @@ SKILLS_SRC="$SCRIPT_DIR/skills"
 usage() {
   cat <<'EOF'
 Usage:
-  ./install.sh --global                 Install into ~/.gemini/config/skills (all projects)
-  ./install.sh --project <repo-path>    Install into <repo-path>/.agents/skills (project-local)
-  ./install.sh --symlink --global       Symlink instead of copy (for local development)
+  ./install.sh --global                  Install into ~/.gemini/config/skills (all projects)
+  ./install.sh --project [repo-path]     Install into <repo-path>/.agents/skills (default: .)
+  ./install.sh --symlink --global        Symlink instead of copy (for local development)
 EOF
 }
 
@@ -19,14 +19,25 @@ USE_SYMLINK=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --global)
+    --global|-g)
       MODE="global"
       shift
       ;;
-    --project)
+    --project|-p)
       MODE="project"
-      TARGET_REPO="${2:-}"
-      shift 2
+      if [[ $# -ge 2 && "${2:-}" != -* ]]; then
+        TARGET_REPO="$2"
+        shift 2
+      else
+        TARGET_REPO="."
+        shift 1
+      fi
+      ;;
+    --project=*)
+      MODE="project"
+      TARGET_REPO="${1#--project=}"
+      TARGET_REPO="${TARGET_REPO:-.}"
+      shift
       ;;
     --symlink)
       USE_SYMLINK=1
@@ -46,8 +57,12 @@ done
 
 if [[ "$MODE" == "global" ]]; then
   DEST="$HOME/.gemini/config/skills"
-elif [[ "$MODE" == "project" && -n "$TARGET_REPO" ]]; then
-  DEST="$TARGET_REPO/.agents/skills"
+elif [[ "$MODE" == "project" ]]; then
+  if [[ ! -d "$TARGET_REPO" ]]; then
+    echo "Error: Target project directory does not exist: $TARGET_REPO" >&2
+    exit 1
+  fi
+  DEST="$(cd "$TARGET_REPO" && pwd)/.agents/skills"
 else
   usage
   exit 1
@@ -68,4 +83,4 @@ for skill_dir in "$SKILLS_SRC"/neon-*; do
   fi
 done
 
-echo "Done. Restart or open a new thread in Antigravity / T3 Code to load the updated skills."
+echo "Done. Open a new thread in Antigravity / T3 Code to load the updated skills."

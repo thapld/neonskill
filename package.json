@@ -1,6 +1,6 @@
 {
   "name": "neonskill",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "8-skill Gemini 4 Neon workflow suite for Antigravity and T3 Code (neon-init, neon-plan, neon-slice, neon-teamwork, neon-review, neon-fix, neon-ship, neon-handoff).",
   "type": "module",
   "bin": {

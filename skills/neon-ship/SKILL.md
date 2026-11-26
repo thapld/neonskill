@@ -16,8 +16,8 @@ Deliver a verified diff following `AGENTS.md` (or `NEON.md`) rules (recommended 
    - Add a **3-line changelog entry** in `CHANGELOG.md` (create if appropriate, or include in the PR body if the repo has no changelog).
    - Check new/changed UI strings for consistency.
 3. **Commit, push & open Draft PR**:
-   - Stage and commit changes cleanly.
-   - Push the branch and open a **draft PR** (`pull_request_create` with `draft: true`, or `gh pr create --draft`) including the pasted test output and 3-line changelog summary.
+   - Stage **explicit file paths** (never blind `git add .` / `git add -A`) and commit cleanly.
+   - Push the branch and open a **draft PR** (`pull_request_create` with `draft: true`, or `gh pr create --draft`) including the pasted test output and 3-line changelog summary. If created via `gh`, call `link_pull_request` in T3 Code right away (`pull_request_create` links automatically).
    - Never merge or push directly to `main` unless explicitly asked.
 4. **Post-PR optional follow-ups** (non-blocking — output after the Draft PR is opened; never modify files or reopen scope without approval):
    - **`IMPROVE`**: name the single step that caused the most friction/retries in this run and propose **1 concrete tweak** to `AGENTS.md` (apply only if the user says yes).
