@@ -1,124 +1,126 @@
 # neonskill
 
-Bộ **8 skill `neon-*`** chuẩn hóa quy trình phát triển phần mềm cho **Gemini 4 Neon** và **Gemini 4 Hydrogen** trên **T3 Code / Antigravity**.
+Bộ **8 skill `neon-*`** chuẩn hóa quy trình phát triển phần mềm cho **Gemini 4 Neon** và **Gemini 4 Hydrogen** trên **T3 Code / Antigravity**, tích hợp đầy đủ với các lệnh native của Antigravity (`/grill-me`, `/goal`, `/boost`, `/swarm`, `/teamwork`).
 
 ## Tổng quan quy trình
 
 ```text
-neon-init  ──▶  neon-plan (Explore + Adaptive Grill + Mode Routing)
+neon-init  ──▶  neon-plan (Explore + Adaptive Grill / /grill-me + Mode Routing)
                     │
-        ┌───────────┴───────────┐
-        ▼                       ▼
-   neon-slice             neon-teamwork
-   (1 luồng)         (nhiều worktree song song)
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+   neon-slice   neon-teamwork  /teamwork
+  (+ /goal)     (swarm /       (dự án nhiều
+        │       worktrees)      milestone)
         └───────────┬───────────┘
                     ▼
                neon-review  ◀──┐
                     │          │ (tối đa 3 vòng;
-         ┌──────────┴────┐     │  2-strike check lại SPEC)
+         ┌──────────┴────┐     │  2-strike check SPEC + /boost)
          ▼ (0 sev 1-2)   ▼     │
      neon-ship       neon-fix ─┘
 
-  * Bất kỳ lúc nào gần chạm 512K context / limit 5h: /compact hoặc neon-handoff
+  * Gần chạm 512K context / limit 5h: /compact hoặc neon-handoff
 ```
+
+## Cài đặt nhanh không cần clone (`npx`)
+
+> Yêu cầu Node.js `>= 18`. Không phụ thuộc thư viện ngoài.
+
+### 1. Cài toàn cục (dùng cho mọi project trên máy)
+```bash
+npx github:thapld/neonskill
+```
+Hoặc dùng đầy đủ URL GitHub:
+```bash
+npx https://github.com/thapld/neonskill.git --global
+```
+*(Cài toàn bộ 8 skill vào `~/.gemini/config/skills/neon-*`.)*
+
+### 2. Cài riêng vào một project hiện tại
+```bash
+npx github:thapld/neonskill --project
+```
+Hoặc chỉ định đường dẫn repo:
+```bash
+npx github:thapld/neonskill --project /duong/dan/toi/repo
+```
+*(Cài vào `<repo>/.agents/skills/neon-*`, tự động trở thành slash command `/neon-init`, `/neon-plan`, ... trong Antigravity / T3 Code.)*
+
+### 3. Các tùy chọn `npx` khác
+```bash
+npx github:thapld/neonskill --list                       # Liệt kê 8 skill
+npx github:thapld/neonskill --only neon-init,neon-plan   # Chỉ cài vài skill cụ thể
+npx github:thapld/neonskill --dry-run --project          # Xem trước đường dẫn cài, không ghi file
+```
+
+### 4. Cách cài bằng `install.sh` (nếu bạn clone repo)
+```bash
+git clone https://github.com/thapld/neonskill.git
+cd neonskill
+./install.sh --global          # hoặc ./install.sh --project /path/to/repo
+```
+
+---
 
 ## Danh sách 8 Skill
 
 | Skill | Vai trò | Model & Thinking khuyến nghị |
 | :--- | :--- | :--- |
-| `neon-init` | Khởi tạo `AGENTS.md` (tĩnh, auto-load), `DECISIONS.md` và `.gitignore` cho repo | Gemini 4 Neon · `HIGH` |
+| `neon-init` | Khởi tạo `AGENTS.md` (tĩnh, auto-load), `DECISIONS.md` và gợi ý `.gitignore` | Gemini 4 Neon · `HIGH` |
 | `neon-plan` | Lập `10-line Codebase Map`, **Adaptive Grill** trước khi viết `SPEC.md`, chọn mode chạy | Gemini 4 Neon · `HIGH` |
-| `neon-slice` | Thực thi 1 slice trong worktree: Zero-Stub, cấm nới test, dán log thật | Gemini 4 Hydrogen · `MEDIUM`/`HIGH` |
-| `neon-teamwork` | Điều phối nhiều slice song song qua `delegate_task` worktrees + merge theo thứ tự | Coordinator: Neon `HIGH` · Workers: Hydrogen |
-| `neon-review` | Mở file test đầu tiên, kiểm tra từng `file:line`, chạy `<TEST_CMD>` & audit `SPEC.md` | Gemini 4 Neon · `HIGH` (nâng `XHIGH` nếu fail/rủi ro cao) |
-| `neon-fix` | Sửa lỗi severity 1–2 theo kiểu test-first, có 2-strike plan-check & cap 3 vòng | Gemini 4 Hydrogen · `MEDIUM`/`HIGH` |
-| `neon-ship` | Lọc file tạm, cập nhật docs (`README.md`, 3-line `CHANGELOG.md`), mở Draft PR (+ `IMPROVE`/`ITERATE`) | Gemini 4 Hydrogen · `LOW`/`MEDIUM` |
+| `neon-slice` | Thực thi 1 slice trong worktree: Zero-Stub, cấm nới test, gợi ý `/goal` cho slice dài và `/boost` khi kẹt bug khó | Gemini 4 Hydrogen · `MEDIUM`/`HIGH` |
+| `neon-teamwork` | Chọn đúng engine: `/teamwork` (multi-milestone), native `swarm` (shared board + `@verifier`), hoặc `delegate_task` worktrees | Coordinator: Neon `HIGH` · Workers: Hydrogen |
+| `neon-review` | Mở file test đầu tiên, kiểm chứng từng `file:line`, dán ≥ 20 dòng cuối `<TEST_CMD>`, audit `SPEC.md` | Gemini 4 Neon · `HIGH` (nâng `XHIGH` nếu fail/rủi ro cao) |
+| `neon-fix` | Sửa lỗi severity 1–2 test-first, có 2-strike plan-check + leo thang `/boost` và hard cap 3 vòng | Gemini 4 Hydrogen · `MEDIUM`/`HIGH` |
+| `neon-ship` | Lọc file tạm, chốt docs (`README.md`, 3-line `CHANGELOG.md`), mở Draft PR (+ `IMPROVE`/`ITERATE`) | Gemini 4 Hydrogen · `LOW`/`MEDIUM` |
 | `neon-handoff` | Lưu trạng thái, `file:line` đang dở, blockers và 3 lệnh tiếp theo vào `HANDOFF.md` | Main thread / Coordinator |
-
----
-
-## Cài đặt
-
-### Cách 1: Cài toàn cục (dùng cho mọi project trên máy)
-```bash
-git clone https://github.com/thapld/neonskill.git
-cd neonskill
-chmod +x install.sh
-./install.sh --global
-```
-*(Skill sẽ được cài vào `~/.gemini/config/skills/neon-*`. Nếu muốn sửa trực tiếp từ repo này, thêm `--symlink`.)*
-
-### Cách 2: Cài riêng cho một project
-```bash
-./install.sh --project /duong/dan/toi/repo-cua-ban
-```
-*(Skill sẽ được cài vào `<repo>/.agents/skills/neon-*`, tự động trở thành slash command `/neon-init`, `/neon-plan`, ... trong Antigravity / T3 Code.)*
 
 ---
 
 ## Hướng dẫn sử dụng trong Project
 
 ### Bước 1: Khởi tạo repo (`neon-init`)
-Chạy một lần khi mới bắt đầu áp dụng bộ skill cho repo:
 ```text
-Dùng skill neon-init để thiết lập AGENTS.md và DECISIONS.md cho repo này.
+/neon-init Thiết lập AGENTS.md và DECISIONS.md cho repo này
 ```
-Skill sẽ tự kiểm tra stack, lệnh test/lint/typecheck và tạo:
-- `AGENTS.md` (không có frontmatter, giữ **100% tĩnh** để tối ưu prompt cache và được Antigravity tự nạp ở mọi lượt).
-- `DECISIONS.md` (nhật ký các quyết định kiến trúc/phạm vi).
+Tự dò stack và lệnh test/lint/typecheck, tạo `AGENTS.md` tĩnh (được Antigravity tự nạp ở mọi lượt) + `DECISIONS.md`.
 
-### Bước 2: Lên kế hoạch & Grill Me (`neon-plan`)
-Trước khi code bất kỳ tính năng mới nào:
+### Bước 2: Lên kế hoạch & Grill Me (`neon-plan` + `/grill-me`)
 ```text
 /neon-plan Thêm tính năng giới hạn tốc độ API theo gói người dùng
 ```
-Agent sẽ thực hiện theo đúng thứ tự:
-1. Đọc `AGENTS.md`, `DECISIONS.md` và code liên quan để dựng **Codebase Map (≤10 dòng)** + **Top 3 file rủi ro nhất (`path:line`)**.
-2. **Adaptive Grill Gate**: hỏi ngược lại bạn (ưu tiên `ask_question` có sẵn lựa chọn `(Recommended)`) để chốt các ngã rẽ thiết kế, phạm vi ngày 1, vùng cấm đụng và tiêu chí `DONE WHEN`. *(Nếu bài toán rất lớn/mơ hồ, có thể dùng thêm `/grill-me`.)*
-3. Ghi các quyết định đã chốt vào `DECISIONS.md`.
-4. Chọn chế độ chạy phù hợp rồi mới xuất `SPEC.md` và **dừng chờ bạn duyệt** trước khi sửa code.
+1. Đọc `AGENTS.md`, `DECISIONS.md`, code liên quan → xuất **Codebase Map (≤10 dòng)** + **Top 3 file rủi ro nhất (`path:line`)**.
+2. **Adaptive Grill Gate**: hỏi ngược lại bạn (có `(Recommended)` đứng đầu) trước khi viết `SPEC.md`. Với bài toán lớn/nhiều ngã rẽ, bạn có thể chạy thẳng `/grill-me` trước hoặc cùng `/plan`.
+3. Lưu quyết định vào `DECISIONS.md`, chọn mode chạy, xuất `SPEC.md` và **dừng chờ bạn duyệt**.
 
-### Bước 3: Chọn chế độ thực thi theo hình dạng bài toán
+### Bước 3: Phối hợp với các Slash Command native của Antigravity
 
-| Hình dạng bài toán | Cách chạy khuyến nghị |
+| Tình huống | Cách gọi khuyến nghị |
 | :--- | :--- |
 | 1 việc phụ đơn lẻ (research, chạy test) | `invoke_subagent` |
-| 1 tính năng gọn hoặc chạy tuần tự | `neon-slice` |
-| 1 bug khó, race condition, refactor sâu | Gợi ý chạy `/boost <task>` |
-| Việc rộng tách sạch theo file trong cùng repo | Gợi ý chạy `/swarm <task>` |
-| Nhiều slice cần tách worktree/port/DB độc lập trên T3 Code | `neon-teamwork` |
-| Dự án lớn nhiều milestone dài ngày | Gợi ý chạy `/teamwork <goal>` |
+| 1 slice gọn chạy tuần tự | `Dùng neon-slice thực hiện Slice 1 trong SPEC.md` |
+| 1 slice dài / cần chạy tới khi có bằng chứng pass | `/goal Dùng neon-slice thực hiện Slice 1 trong SPEC.md: <TEST_CMD> pass và có test mới` |
+| Gặp bug khó, race condition, thuật toán hoặc fail lặp 2 lần | `/boost Fix <mô tả bug> tại <file:line>; repro: <repro>; verify với <TEST_CMD>` |
+| Nhiều file độc lập trong Antigravity (shared board) | Dùng `neon-teamwork` (engine native `swarm`) hoặc `/swarm <task>` |
+| Nhiều slice cần tách worktree/port/DB trên T3 Code (hoặc cross-provider) | `Dùng neon-teamwork điều phối các slice trong SPEC.md` |
+| Dự án dài nhiều milestone (vài giờ → nhiều ngày) | `/teamwork <goal> — bám theo SPEC.md và AGENTS.md` |
 
-### Bước 4: Triển khai (`neon-slice` hoặc `neon-teamwork`)
-* **Chạy đơn luồng:**
-  ```text
-  Thực hiện Slice 1 trong SPEC.md bằng neon-slice.
-  ```
-* **Chạy song song trên T3 Code:**
-  ```text
-  Dùng neon-teamwork để điều phối các slice trong SPEC.md.
-  ```
-  Coordinator sẽ kiểm tra `orchestrator_capabilities`, cảnh báo chi phí trước khi fan-out, chạy mỗi slice trong 1 worktree riêng, và chỉ mình coordinator ghi tiến độ/blockers vào `HANDOFF.md`.
-
-### Bước 5: Review & Sửa lỗi (`neon-review` → `neon-fix`)
-Sau khi code xong hoặc merge các slice vào nhánh tích hợp:
+### Bước 4: Review & Sửa lỗi (`neon-review` → `neon-fix` → `/boost`)
 ```text
 Chạy neon-review trên diff hiện tại so với SPEC.md.
 ```
-* Reviewer mở **file test ra kiểm tra đầu tiên** (bắt lỗi nới lỏng hoặc skip test), kiểm chứng mọi `file:line`, dán ít nhất 20 dòng cuối output thật từ `<TEST_CMD>`.
-* Nếu có lỗi `severity 1–2`, chạy `neon-fix` (viết failing test tái hiện lỗi trước rồi mới sửa, tối đa 3 vòng; nếu lặp 2 lần cùng lỗi sẽ lùi lại kiểm tra giả định trong `SPEC.md`).
+* Reviewer mở **file test đầu tiên** (bắt lỗi nới lỏng hoặc skip test), mở lại mọi `file:line`, dán ít nhất 20 dòng cuối output thật.
+* Nếu có lỗi `severity 1–2`, chạy `neon-fix` (viết failing test trước khi sửa, tối đa 3 vòng). Nếu cùng 1 lỗi fail 2 lần liên tiếp hoặc là bug sâu, skill sẽ kiểm tra lại giả định trong `SPEC.md` và xuất sẵn lệnh `/boost` để xử lý triệt để.
 
-### Bước 6: Đóng gói & Mở Draft PR (`neon-ship`)
-Khi `severity 1–2` về `0`:
+### Bước 5: Đóng gói & Mở Draft PR (`neon-ship`)
 ```text
 Chạy neon-ship để hoàn thiện docs và mở Draft PR.
 ```
-Skill sẽ tự lọc file tạm (`HANDOFF.md`), cập nhật `README.md` + `CHANGELOG.md` (3 dòng), commit, push nhánh, mở Draft PR kèm output test thật, và sau khi mở PR có thể gợi ý thêm 1 cải tiến cho `AGENTS.md` (`IMPROVE`) hoặc 3 ý tưởng v2 (`ITERATE`).
+Lọc `HANDOFF.md` khỏi commit, cập nhật `README.md` + 3-line `CHANGELOG.md`, push nhánh, mở Draft PR kèm output test thật, sau đó gợi ý tùy chọn `IMPROVE` (1 cải tiến cho `AGENTS.md`) và `ITERATE` (3 ý tưởng v2).
 
-### Bước 7: Bảo toàn trạng thái khi dài phiên (`neon-handoff`)
-Khi thread sắp chạm ngưỡng **512K context** trên Antigravity app hoặc sắp hết giới hạn 5 giờ/tuần:
-1. Ưu tiên chạy `/compact`.
-2. Nếu không khả dụng hoặc vẫn chật, chạy `neon-handoff` ở thread chính để ghi `HANDOFF.md` (`Done`, `Half-done với file:line`, `Blockers & Next Fix`, `Next 3 commands`), sau đó `/clear` và nạp lại từ `AGENTS.md` + `DECISIONS.md` + `HANDOFF.md`.
+### Bước 6: Bảo toàn trạng thái (`neon-handoff`)
+Khi gần chạm **512K context** trên Antigravity app hoặc giới hạn 5 giờ/tuần: ưu tiên `/compact`; nếu cần reset sạch thì chạy `neon-handoff` ở thread chính để ghi `HANDOFF.md`, sau đó `/clear` và nạp lại từ `AGENTS.md` + `DECISIONS.md` + `HANDOFF.md`.
 
 ---
 
@@ -126,8 +128,10 @@ Khi thread sắp chạm ngưỡng **512K context** trên Antigravity app hoặc 
 
 ```text
 neonskill/
-├── README.md
+├── package.json
+├── bin/cli.mjs
 ├── install.sh
+├── README.md
 ├── .gitignore
 └── skills/
     ├── neon-init/SKILL.md

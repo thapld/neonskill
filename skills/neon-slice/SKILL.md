@@ -1,6 +1,6 @@
 ---
 name: neon-slice
-description: Execute one slice or phase from SPEC.md in the current worktree with strict file boundaries, zero-stub discipline, anti-test-loosening rules, failure-mode handling, and pasted test proof. Use when implementing a slice or phase.
+description: Execute one slice or phase from SPEC.md in the current worktree with strict file boundaries, zero-stub discipline, anti-test-loosening rules, /goal & /boost escalation for Antigravity, failure-mode handling, and pasted test proof. Use when implementing a slice or phase.
 ---
 
 # Neon Slice Executor
@@ -14,6 +14,8 @@ Implement a single slice following `AGENTS.md` (or `NEON.md`) rules (recommended
    - **DO NOT**: files and commands belonging to other slices (off-limits).
    - **THINKING**: target thinking level for this slice.
    - **RETURN**: changed files (`file:line`), pasted test output, and blockers/open doubts.
+   - **Long / strict slices → `/goal`**: If the slice is large, multi-step, or needs uninterrupted proof-driven execution in Antigravity, recommend running it via `/goal` and output a ready-to-paste command:
+     `/goal Execute Slice <N> from SPEC.md with neon-slice: <TEST_CMD> passes and a new test covers the change.`
 2. **Implement with strict discipline**:
    - Stay strictly within owned file boundaries.
    - **Direct & Zero-Stub**: no `TODO`s, no placeholder stubs, no truncated code, and no guesses presented as fact (*no path, no claim*).
@@ -28,6 +30,8 @@ Implement a single slice following `AGENTS.md` (or `NEON.md`) rules (recommended
    - **Stuck loop**: raise thinking level or summarize failed attempts into a concise hint (never adjust `temperature`).
    - **Oscillating** (bouncing between 2 approaches): stop immediately, list both attempts, and ask.
    - **Edit-from-here** (resumed in a fresh session): restate the short plan before editing.
-   - **2-strike hard cap**: after 2 consecutive identical failures, stop and report `what failed` + `next fix`. **Parallel slice workers must never edit `HANDOFF.md`** — return blockers in `RETURN` so the coordinator owns `HANDOFF.md`.
+   - **Hard bug / 2-strike escalation → `/boost`**: On deep bugs (race conditions, tricky algorithms, complex refactors) or after 2 consecutive identical failures, stop patching blindly, report `what failed` + `next fix`, and output a ready-to-paste Antigravity `/boost` command:
+     `/boost Fix <bug summary> at <file:line>; repro: <repro>; verify with <TEST_CMD>`
+   - **Single-writer `HANDOFF.md`**: parallel slice workers must never edit `HANDOFF.md` — return blockers in `RETURN` so the coordinator owns `HANDOFF.md`.
 5. **Return**:
    - Changed files (`file:line`), **actual pasted test output** (at least the last 20 lines, never summarized), and any blockers or open doubts.

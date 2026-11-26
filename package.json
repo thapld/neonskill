@@ -1,0 +1,23 @@
+{
+  "name": "neonskill",
+  "version": "2.1.0",
+  "description": "8-skill Gemini 4 Neon workflow suite for Antigravity and T3 Code (neon-init, neon-plan, neon-slice, neon-teamwork, neon-review, neon-fix, neon-ship, neon-handoff).",
+  "type": "module",
+  "bin": {
+    "neonskill": "./bin/cli.mjs"
+  },
+  "files": [
+    "bin",
+    "skills",
+    "install.sh",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thapld/neonskill.git"
+  },
+  "license": "MIT"
+}
