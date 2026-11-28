@@ -16,6 +16,7 @@ Fix review findings following `AGENTS.md` (or `NEON.md`) rules (recommended mode
      3. **Never loosen, skip, or delete an existing valid test** to make `<TEST_CMD>` pass.
      4. Re-run `<TEST_CMD>` in the worktree and verify all tests pass.
 3. **Plan-Check, `/boost` Escalation & Hard Cap**:
+   - **Deep Debugging ("Measure before you theorize")**: For stubborn performance or environment-specific findings, measure and table each stage's timing (including OS, disk, mount, DNS, and CPU layers) before theorizing or patching (*"if you did not measure it, say 'not measured'"*).
    - **2-strike circuit breaker**: If the same finding fails 2 consecutive attempts, oscillates between 2 approaches, or involves a hard bug (race condition, algorithmic flaw, deep state bug), **stop patching lines** (never adjust `temperature`):
      1. Step back and check whether `SPEC.md` or the slice design has a broken assumption.
      2. Output a ready-to-paste Antigravity `/boost` command so the user can trigger the deep implement → challenge → fix → re-verify loop:

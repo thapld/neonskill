@@ -7,19 +7,21 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const SKILLS_SRC = path.resolve(__dirname, "..", "skills");
+const AGENTS_SRC = path.resolve(__dirname, "..", "agents");
 
 function printUsage() {
-  console.log(`neonskill — Install or remove the 8 neon-* skills for Antigravity, T3 Code & Orca
+  console.log(`neonskill — Install or remove the 8 neon-* skills & @verifier agent for Antigravity, T3 Code & Orca
 
 Usage:
-  npx github:thapld/neonskill                       Install globally for Antigravity/T3 Code (~/.gemini/config/skills)
-  npx github:thapld/neonskill --orca                Install globally for Orca shared agents (~/.agents/skills)
+  npx github:thapld/neonskill                       Install globally for Antigravity/T3 Code (~/.gemini/config/{skills,agents})
+  npx github:thapld/neonskill --orca                Install globally for Orca shared agents (~/.agents/{skills,agents})
   npx github:thapld/neonskill --target <t>          Target: antigravity | orca | universal | all
-  npx github:thapld/neonskill --project [dir]       Install into <dir>/.agents/skills (works in Antigravity, T3 Code & Orca)
-  npx github:thapld/neonskill --only neon-plan,...  Target only selected skills (comma-separated)
-  npx github:thapld/neonskill --uninstall           Remove installed neon-* skills from target location(s)
+  npx github:thapld/neonskill --project [dir]       Install into <dir>/.agents/{skills,agents} (works in Antigravity, T3 Code & Orca)
+  npx github:thapld/neonskill --only neon-plan,...  Target only selected skills (skips agents to avoid partial wipes)
+  npx github:thapld/neonskill --no-agents           Install or uninstall skills only without touching agents/verifier.md
+  npx github:thapld/neonskill --uninstall           Remove installed neon-* skills (and verifier.md unless --only/--no-agents)
   npx github:thapld/neonskill --dry-run             Preview actions without writing or deleting files
-  npx github:thapld/neonskill --list                List bundled skills
+  npx github:thapld/neonskill --list                List bundled skills and agents
   npx github:thapld/neonskill --help                Show this help
 `);
 }
@@ -30,6 +32,19 @@ function getAvailableSkills() {
     .filter((d) => d.isDirectory() && d.name.startsWith("neon-"))
     .map((d) => d.name)
     .sort();
+}
+
+function getAvailableAgents() {
+  if (!fs.existsSync(AGENTS_SRC)) return [];
+  return fs
+    .readdirSync(AGENTS_SRC, { withFileTypes: true })
+    .filter((d) => (d.isFile() || d.isSymbolicLink()) && d.name.endsWith(".md"))
+    .map((d) => d.name)
+    .sort();
+}
+
+function pathExists(targetPath) {
+  return Boolean(fs.lstatSync(targetPath, { throwIfNoEntry: false }));
 }
 
 function parseOnlyValue(raw) {
@@ -66,6 +81,7 @@ let projectDir = process.cwd();
 let projectExplicit = false;
 let dryRun = false;
 let uninstall = false;
+let skipAgents = false;
 let onlyList = null;
 
 for (let i = 0; i < args.length; i++) {
@@ -74,7 +90,10 @@ for (let i = 0; i < args.length; i++) {
     printUsage();
     process.exit(0);
   } else if (arg === "--list") {
-    for (const s of getAvailableSkills()) console.log(s);
+    console.log("Skills:");
+    for (const s of getAvailableSkills()) console.log(`  ${s}`);
+    console.log("Agents:");
+    for (const a of getAvailableAgents()) console.log(`  ${a}`);
     process.exit(0);
   } else if (arg === "--global" || arg === "-g") {
     mode = "global";
@@ -116,6 +135,8 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (arg.startsWith("--only=")) {
     onlyList = parseOnlyValue(arg.slice("--only=".length));
+  } else if (arg === "--no-agents") {
+    skipAgents = true;
   } else if (arg === "--uninstall") {
     uninstall = true;
   } else if (arg === "--dry-run") {
@@ -127,17 +148,18 @@ for (let i = 0; i < args.length; i++) {
   }
 }
 
-const available = getAvailableSkills();
-let selected = available;
+const availableSkills = getAvailableSkills();
+const availableAgents = getAvailableAgents();
+let selectedSkills = availableSkills;
 
 if (onlyList) {
-  const unknown = onlyList.filter((s) => !available.includes(s));
+  const unknown = onlyList.filter((s) => !availableSkills.includes(s));
   if (unknown.length > 0) {
     console.error(`Unknown skill(s): ${unknown.join(", ")}`);
-    console.error(`Available skills: ${available.join(", ")}`);
+    console.error(`Available skills: ${availableSkills.join(", ")}`);
     process.exit(1);
   }
-  selected = onlyList;
+  selectedSkills = onlyList;
 }
 
 if (mode === "project" && projectExplicit && !fs.existsSync(projectDir)) {
@@ -147,26 +169,39 @@ if (mode === "project" && projectExplicit && !fs.existsSync(projectDir)) {
   process.exit(1);
 }
 
-const antigravityDir = path.join(os.homedir(), ".gemini", "config", "skills");
-const orcaUniversalDir = path.join(os.homedir(), ".agents", "skills");
+const antigravityTarget = {
+  skillsDir: path.join(os.homedir(), ".gemini", "config", "skills"),
+  agentsDir: path.join(os.homedir(), ".gemini", "config", "agents"),
+};
+const orcaTarget = {
+  skillsDir: path.join(os.homedir(), ".agents", "skills"),
+  agentsDir: path.join(os.homedir(), ".agents", "agents"),
+};
 
-const destRoots =
+const destTargets =
   mode === "project"
-    ? [path.join(projectDir, ".agents", "skills")]
+    ? [
+        {
+          skillsDir: path.join(projectDir, ".agents", "skills"),
+          agentsDir: path.join(projectDir, ".agents", "agents"),
+        },
+      ]
     : target === "all"
-      ? [antigravityDir, orcaUniversalDir]
+      ? [antigravityTarget, orcaTarget]
       : target === "orca"
-        ? [orcaUniversalDir]
-        : [antigravityDir];
+        ? [orcaTarget]
+        : [antigravityTarget];
 
-for (const destRoot of destRoots) {
+const manageAgents = !skipAgents && !onlyList && availableAgents.length > 0;
+
+for (const { skillsDir, agentsDir } of destTargets) {
   if (uninstall) {
     console.log(
-      `${dryRun ? "[dry-run] " : ""}Removing ${selected.length} skill(s) (${mode}) from ${destRoot}`
+      `${dryRun ? "[dry-run] " : ""}Removing ${selectedSkills.length} skill(s) (${mode}) from ${skillsDir}`
     );
-    for (const name of selected) {
-      const dst = path.join(destRoot, name);
-      if (!fs.existsSync(dst)) {
+    for (const name of selectedSkills) {
+      const dst = path.join(skillsDir, name);
+      if (!pathExists(dst)) {
         console.log(`  skip (not installed) ${name}`);
       } else if (dryRun) {
         console.log(`  would remove ${name} -> ${dst}`);
@@ -175,16 +210,33 @@ for (const destRoot of destRoots) {
         console.log(`  removed ${name} -> ${dst}`);
       }
     }
+
+    if (manageAgents) {
+      console.log(
+        `${dryRun ? "[dry-run] " : ""}Removing ${availableAgents.length} agent(s) (${mode}) from ${agentsDir}`
+      );
+      for (const file of availableAgents) {
+        const dst = path.join(agentsDir, file);
+        if (!pathExists(dst)) {
+          console.log(`  skip (not installed) ${file}`);
+        } else if (dryRun) {
+          console.log(`  would remove ${file} -> ${dst}`);
+        } else {
+          fs.rmSync(dst, { force: true });
+          console.log(`  removed ${file} -> ${dst}`);
+        }
+      }
+    }
   } else {
     console.log(
-      `${dryRun ? "[dry-run] " : ""}Installing ${selected.length} skill(s) (${mode}) -> ${destRoot}`
+      `${dryRun ? "[dry-run] " : ""}Installing ${selectedSkills.length} skill(s) (${mode}) -> ${skillsDir}`
     );
     if (!dryRun) {
-      fs.mkdirSync(destRoot, { recursive: true });
+      fs.mkdirSync(skillsDir, { recursive: true });
     }
-    for (const name of selected) {
+    for (const name of selectedSkills) {
       const src = path.join(SKILLS_SRC, name);
-      const dst = path.join(destRoot, name);
+      const dst = path.join(skillsDir, name);
       if (dryRun) {
         console.log(`  would install ${name} -> ${dst}`);
       } else {
@@ -193,7 +245,33 @@ for (const destRoot of destRoots) {
         console.log(`  installed ${name} -> ${dst}`);
       }
     }
+
+    if (manageAgents) {
+      console.log(
+        `${dryRun ? "[dry-run] " : ""}Installing ${availableAgents.length} agent(s) (${mode}) -> ${agentsDir}`
+      );
+      if (!dryRun) {
+        fs.mkdirSync(agentsDir, { recursive: true });
+      }
+      for (const file of availableAgents) {
+        const src = path.join(AGENTS_SRC, file);
+        const dst = path.join(agentsDir, file);
+        if (dryRun) {
+          console.log(`  would install ${file} -> ${dst}`);
+        } else {
+          fs.rmSync(dst, { force: true });
+          fs.copyFileSync(src, dst);
+          console.log(`  installed ${file} -> ${dst}`);
+        }
+      }
+    }
   }
+}
+
+if (skipAgents) {
+  console.log(`${dryRun ? "[dry-run] " : ""}Skipped agents (--no-agents).`);
+} else if (onlyList) {
+  console.log(`${dryRun ? "[dry-run] " : ""}Skipped agents (--only restricts target to selected skills).`);
 }
 
 console.log(
@@ -201,5 +279,5 @@ console.log(
     ? "Dry-run complete. No files were written or deleted."
     : uninstall
       ? "Uninstall complete."
-      : "Done. Open a new thread/session in Antigravity, T3 Code, or Orca to load the updated skills."
+      : "Done. Open a new thread/session in Antigravity, T3 Code, or Orca to load the updated skills & @verifier agent."
 );

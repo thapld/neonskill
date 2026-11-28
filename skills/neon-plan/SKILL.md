@@ -11,6 +11,7 @@ Plan before coding following `AGENTS.md` (or `NEON.md`) rules (recommended model
    - If file-edit or terminal tools are unavailable, state `CHAT MODE` and deliver the plan in chat.
 2. **Explore & map first** (never ask what the repo already answers):
    - Read `AGENTS.md` (and `NEON.md` if present), `DECISIONS.md`, relevant source files, and test config.
+   - On large or unfamiliar repos, run a read-only `/swarm` audit (or read-only `research` subagents) first to map boundaries and risks before granting any write ownership.
    - Draft a **10-line Codebase Map** and **Top 3 Riskiest Files** (`path:line`, 1-based).
 3. **Adaptive Grill Gate (BEFORE writing `SPEC.md`)**:
    - Skip **only** if the user explicitly opted out (*"decide everything, don't ask"*) or all key decisions are already unambiguous from the prompt and repo.
@@ -25,6 +26,7 @@ Plan before coding following `AGENTS.md` (or `NEON.md`) rules (recommended model
    - **Deep Grill**: multiple decision-tree rounds for large/ambiguous work (or recommend `/grill-me` when deep interactive alignment is needed).
 4. **Lock decisions & pick execution mode**:
    - After user answers arrive, append locked decisions to `DECISIONS.md` (create if missing; in `CHAT MODE`, output the entries in chat instead of writing files).
+   - **Thinking-level cost curve**: `low` 1x · `medium` 2.5x · `high` 5x · `xhigh` 8.6x (~72% more than `high` for marginal gain on most tasks). Default planner/reviewer to **HIGH** and reserve **XHIGH** strictly for genuinely stuck or high-risk work.
    - Match the mode to the problem shape (note: agent cannot execute slash commands directly — recommend them for the user to invoke):
      - *One focused side task* (research, test run) → `invoke_subagent`.
      - *Single cohesive feature / sequential work* → `neon-slice`.

@@ -30,6 +30,7 @@ Implement a single slice following `AGENTS.md` (or `NEON.md`) rules (recommended
    - **Success**: `<TEST_CMD>` passes with new tests covering the change.
    - **Stuck loop**: raise thinking level or summarize failed attempts into a concise hint (never send `thinking_budget` or adjust `temperature`).
    - **Oscillating** (bouncing between 2 approaches): stop immediately, list both attempts, and ask.
+   - **Deep Debugging ("Measure before you theorize")**: For stubborn performance or environment-specific bugs, measure and table each stage's timing (including OS, disk, mount, DNS, and CPU layers) before theorizing or patching (*"if you did not measure it, say 'not measured'"*).
    - **Edit-from-here** (resumed in a fresh session): restate the short plan before editing.
    - **Hard bug / 2-strike escalation → `/boost`**: On deep bugs (race conditions, tricky algorithms, complex refactors) or after 2 consecutive identical failures, stop patching blindly, report `what failed` + `next fix`, and output a ready-to-paste Antigravity `/boost` command:
      `/boost Fix <bug summary> at <file:line>; repro: <repro>; verify with <TEST_CMD>`
