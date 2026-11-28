@@ -1,24 +1,24 @@
 # neonskill
 
-Bộ **8 skill `neon-*`** + agent **`@verifier`** (`agents/verifier.md`) chuẩn hóa quy trình phát triển phần mềm cho **Gemini 4 Neon** và **Gemini 4 Hydrogen** trên **Antigravity**, **T3 Code** và **Orca** (`orca-cli` + `orchestration`), tích hợp đầy đủ với các lệnh native (`/grill-me`, `/goal`, `/boost`, `/swarm`, `/teamwork`).
+Bộ **9 skill `neon-*`** + agent **`@verifier`** (`agents/verifier.md`) chuẩn hóa quy trình phát triển phần mềm cho **Gemini 4 Neon** và **Gemini 4 Hydrogen** trên **Antigravity**, **T3 Code** và **Orca** (`orca-cli` + `orchestration`), tích hợp đầy đủ với các lệnh native (`/grill-me`, `/goal`, `/boost`, `/swarm`, `/teamwork`).
 
 ## Tổng quan quy trình
 
 ```text
-neon-init  ──▶  neon-plan (Explore + Adaptive Grill / /grill-me + Mode Routing)
-                    │
-        ┌───────────┼───────────────────┐
-        ▼           ▼                   ▼
-   neon-slice   neon-teamwork      /teamwork
-  (+ /goal)     (swarm / T3 Code    (dự án nhiều
-        │        / Orca workers)     milestone)
-        └───────────┬───────────────────┘
-                    ▼
-               neon-review  ◀──┐
-                    │          │ (tối đa 3 vòng;
-         ┌──────────┴────┐     │  2-strike check SPEC + /boost)
-         ▼ (0 sev 1-2)   ▼     │
-     neon-ship       neon-fix ─┘
+[neon-cleanup] ──▶ neon-init ──▶ neon-plan (Explore + Adaptive Grill / /grill-me + Mode Routing)
+                                     │
+                         ┌───────────┼───────────────────┐
+                         ▼           ▼                   ▼
+                    neon-slice   neon-teamwork      /teamwork
+                   (+ /goal)     (swarm / T3 Code    (dự án nhiều
+                         │        / Orca workers)     milestone)
+                         └───────────┬───────────────────┘
+                                     ▼
+                                neon-review  ◀──┐
+                                     │          │ (tối đa 3 vòng;
+                          ┌──────────┴────┐     │  2-strike check SPEC + /boost)
+                          ▼ (0 sev 1-2)   ▼     │
+                      neon-ship       neon-fix ─┘
 
   * Gần chạm 512K context / limit 5h: /compact hoặc neon-handoff
 ```
@@ -35,7 +35,7 @@ Hoặc dùng URL `git+https`:
 ```bash
 npx git+https://github.com/thapld/neonskill.git --global
 ```
-*(Cài toàn bộ 8 skill vào `~/.gemini/config/skills/neon-*` và `@verifier` vào `~/.gemini/config/agents/verifier.md`.)*
+*(Cài toàn bộ 9 skill vào `~/.gemini/config/skills/neon-*` và `@verifier` vào `~/.gemini/config/agents/verifier.md`.)*
 
 ### 2. Cài cho Orca (dùng chung cho Claude, Codex, Antigravity, Gemini, Hermes...)
 ```bash
@@ -59,7 +59,7 @@ npx github:thapld/neonskill --project /duong/dan/toi/repo
 
 ### 4. Các tùy chọn `npx` khác
 ```bash
-npx github:thapld/neonskill --list                             # Liệt kê 8 skill & agent đi kèm
+npx github:thapld/neonskill --list                             # Liệt kê 9 skill & agent đi kèm
 npx github:thapld/neonskill --only=neon-init,neon-plan         # Chỉ cài/gỡ vài skill cụ thể (không đụng verifier.md)
 npx github:thapld/neonskill --no-agents                        # Chỉ cài/gỡ skills, bỏ qua agents/verifier.md
 npx github:thapld/neonskill --dry-run --target all             # Xem trước đường dẫn cài/gỡ, không ghi file
@@ -78,10 +78,11 @@ cd neonskill
 
 ---
 
-## Danh sách 8 Skill
+## Danh sách 9 Skill
 
 | Skill | Vai trò | Model & Thinking khuyến nghị |
 | :--- | :--- | :--- |
+| `neon-cleanup` | Audit read-only rác agent/tài liệu rải rác/test lạc chỗ, lập plan 3 nhóm chờ duyệt và chuẩn hóa vệ sinh trước `neon-init` | Gemini 4 Neon · `HIGH` |
 | `neon-init` | Khởi tạo `AGENTS.md` (tĩnh, auto-load), `DECISIONS.md` và gợi ý `.gitignore` | Gemini 4 Neon · `HIGH` |
 | `neon-plan` | Lập `10-line Codebase Map`, **Adaptive Grill** trước khi viết `SPEC.md`, chọn mode chạy | Gemini 4 Neon · `HIGH` |
 | `neon-slice` | Thực thi 1 slice trong worktree: Zero-Stub, cấm nới test, hỗ trợ Orca status/browser, gợi ý `/goal` & `/boost` | Gemini 4 Hydrogen · `MEDIUM`/`HIGH` |
@@ -96,7 +97,12 @@ cd neonskill
 
 ## Hướng dẫn sử dụng trong Project & trên Orca
 
-### Bước 1: Khởi tạo repo (`neon-init`)
+### Bước 1: Dọn dẹp (nếu cần) & Khởi tạo repo (`neon-cleanup` → `neon-init`)
+*Nếu repo cũ đang bừa bộn rác agent, tài liệu `PLAN`/`NOTES` rải rác hoặc nhiều file steering chồng chéo (`GEMINI.md`, `CLAUDE.md`, `.cursorrules`...), chạy `/neon-cleanup` trước để audit read-only và dọn sạch có kiểm soát:*
+```text
+/neon-cleanup Audit rác và đề xuất kế hoạch dọn repo trước khi chuẩn hóa
+```
+*Sau đó khởi tạo cấu hình chuẩn cho repo:*
 ```text
 /neon-init Thiết lập AGENTS.md và DECISIONS.md cho repo này
 ```
@@ -152,6 +158,9 @@ neonskill/
 ├── agents/
 │   └── verifier.md
 └── skills/
+    ├── neon-cleanup/
+    │   ├── SKILL.md
+    │   └── scripts/audit-clutter.sh
     ├── neon-init/SKILL.md
     ├── neon-plan/SKILL.md
     ├── neon-slice/SKILL.md

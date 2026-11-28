@@ -195,7 +195,7 @@ for idx in "${!SKILL_DESTS[@]}"; do
           ln -s "$skill_dir" "$dst"
           echo "  linked $name -> $dst"
         else
-          cp -R "$skill_dir" "$dst"
+          cp -Rp "$skill_dir" "$dst"
           echo "  installed $name -> $dst"
         fi
       fi

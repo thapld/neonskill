@@ -10,7 +10,7 @@ const SKILLS_SRC = path.resolve(__dirname, "..", "skills");
 const AGENTS_SRC = path.resolve(__dirname, "..", "agents");
 
 function printUsage() {
-  console.log(`neonskill — Install or remove the 8 neon-* skills & @verifier agent for Antigravity, T3 Code & Orca
+  console.log(`neonskill — Install or remove the 9 neon-* skills & @verifier agent for Antigravity, T3 Code & Orca
 
 Usage:
   npx github:thapld/neonskill                       Install globally for Antigravity/T3 Code (~/.gemini/config/{skills,agents})

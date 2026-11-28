@@ -1,7 +1,7 @@
 {
   "name": "neonskill",
-  "version": "2.3.3",
-  "description": "8-skill + @verifier Gemini 4 Neon workflow suite for Antigravity, T3 Code, and Orca (neon-init, neon-plan, neon-slice, neon-teamwork, neon-review, neon-fix, neon-ship, neon-handoff).",
+  "version": "2.4.0",
+  "description": "9-skill + @verifier Gemini 4 Neon workflow suite for Antigravity, T3 Code, and Orca (neon-cleanup, neon-init, neon-plan, neon-slice, neon-teamwork, neon-review, neon-fix, neon-ship, neon-handoff).",
   "type": "module",
   "bin": {
     "neonskill": "./bin/cli.mjs"
