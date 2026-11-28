@@ -12,6 +12,7 @@ Bootstrap a repo for the `neon-*` workflow (recommended model: **Gemini 4 Neon Â
    - If the repo is cluttered with pre-existing agent debris, scattered plans/docs, or conflicting steering files, recommend running `neon-cleanup` first before bootstrapping.
    - If `NEON.md` exists without `AGENTS.md`, ask whether to migrate its rules into `AGENTS.md` (Antigravity auto-loads `AGENTS.md` on every turn, not `NEON.md`) or add a concise `AGENTS.md` pointing to it.
 2. **Create or update `AGENTS.md`** (plain Markdown, **no YAML frontmatter**):
+   - **If `AGENTS.md` already exists** (repo upgrade): audit it against the baseline below for missing **Test & Scratch Hygiene**, **Autonomy Gates**, **Prompt Injection Defense**, **Tool & Isolation Hygiene**, or volatile timestamps/active TODOs hurting implicit prompt caching, and propose a minimal non-destructive diff that preserves all existing repo-specific rules and commands.
    - Keep it **short and 100% static** at the top of prompts so Gemini implicit prompt caching applies (4,096+ tokens, up to 95% input discount) â€” never put timestamps, active task progress, or volatile TODOs here.
    - Include:
      - **Commands**: exact build, typecheck, lint, and `<TEST_CMD>`.

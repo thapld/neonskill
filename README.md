@@ -71,10 +71,34 @@ npx github:thapld/neonskill --uninstall --project              # Gỡ các skill
 ```bash
 git clone https://github.com/thapld/neonskill.git
 cd neonskill
-./install.sh --global            # hoặc --orca | --target all | --project /path/to/repo
-./install.sh --symlink --global  # symlink cả neon-* và verifier.md để phát triển local
+./install.sh --global                  # hoặc --orca | --target all | --project /path/to/repo
+./install.sh --symlink --global        # symlink cả neon-* và verifier.md để phát triển local
 ./install.sh --uninstall --target all  # hỗ trợ --no-agents và --dry-run
 ```
+
+## Cập nhật (`--update`) & Kiểm tra phiên bản (`--check`)
+
+Mỗi lần cài hoặc cập nhật, `neonskill` tự ghi file metadata ẩn `.neonskill.json` (lưu `version`, danh sách `skills`, `agents`, `updatedAt`) vào từng thư mục đích để theo dõi phiên bản và tự nhận diện khi nâng cấp.
+
+### Bằng `npx` (tự động nhận diện toàn bộ vị trí đã cài)
+```bash
+# Kiểm tra phiên bản đã cài so với bản đóng gói & upstream main (chỉ đọc, tự fallback nếu offline)
+npx --yes github:thapld/neonskill#main --check
+
+# Tự động dò và cập nhật mọi nơi đã cài (~/.gemini/config, ~/.agents, ./.agents)
+npx --yes github:thapld/neonskill#main --update
+```
+> **Lưu ý cache `npx`:** `npx` có thể giữ bản cũ trong cache cục bộ; hãy thêm `#main` và `--yes` (hoặc `npx --ignore-existing github:thapld/neonskill#main --update`) để luôn kéo bản mới nhất từ `main`. Bạn cũng có thể giới hạn đích cập nhật bằng `--target all`, `--orca`, hoặc `--project [dir]` (hỗ trợ cả positional `update` / `check`).
+
+### Bằng `./install.sh` (từ repo clone local)
+```bash
+./install.sh --check              # Kiểm tra phiên bản trong .neonskill.json so với package.json local
+./install.sh --update             # Tự chạy git pull --ff-only (nếu repo sạch) rồi cập nhật các đích đã cài
+./install.sh --update --no-pull   # Cập nhật từ bản local mà không chạy git pull (offline hoặc clone đang sửa dở)
+```
+> Nếu thư mục đích đang dùng `--symlink`, `./install.sh --update` sẽ tự giữ nguyên symlink (dùng `--copy` nếu muốn chuyển sang bản copy).
+
+> **Nâng cấp `AGENTS.md` trong repo cũ:** Sau khi cập nhật skill, chạy lại `/neon-init` trong repo bất kỳ — `neon-init` sẽ tự audit `AGENTS.md` hiện có theo chuẩn mới nhất (kiểm tra **Test & Scratch Hygiene**, **Autonomy Gates**, **Prompt Injection Defense**, **Tool & Isolation Hygiene**, và lọc timestamp/TODO gây mất implicit caching) rồi đề xuất diff tối thiểu mà không ghi đè rule riêng của repo.
 
 ---
 
