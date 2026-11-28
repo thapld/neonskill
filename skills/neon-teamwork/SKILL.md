@@ -14,8 +14,9 @@ Coordinate parallel or large-scale `SPEC.md` execution (recommended coordinator:
    - **Long multi-milestone project in Antigravity (hours–days)**: Do **not** force into manual `delegate_task` waves. Output a ready-to-paste `/teamwork` command so the user invokes Antigravity's sentinel + orchestrator + critic/challenger/auditor gates:
      `/teamwork <goal> — follow SPEC.md and AGENTS.md`
    - **Wide parallel work via Antigravity native `swarm`**: Only when the user asks for `/swarm` or swarm mode (or when running natively in Antigravity — never silently fall back from `delegate_task` in T3 Code), follow `native_swarm` rules:
-     - Leave `model` unset so workers inherit your model unless the user explicitly requests another model (e.g., a different model for `@verifier`).
+     - Leave `model` unset so workers inherit your model unless the user explicitly requests another model. Because `.agents/agents/<name>.md` frontmatter `model:` only accepts `inherit|flash|pro`, pin `@verifier` to a different model (e.g., Carbon, Neon, or Opus 5.5) through the coordinator prompt or Members tab.
      - Give editing authors `workspace: "share"` and require them to commit before posting `[done]`; run the bundled read-only `@verifier` (`agents/verifier.md`) on `workspace: "inherit"` in a fresh context (ideally on a different model) to audit test files first and verify every `file:line` + `<TEST_CMD>` before posting `PASS`.
+     - Require short, structured worker reports (`file:line`, pasted command proof, blockers) since worker output tokens dominate swarm cost.
      - Coordinator never writes code; remember board tools arrive one turn after the first `swarm add`; **always land/merge a worker's commit BEFORE calling `kill`** (`kill` permanently deletes its workspace).
    - **Orca parallel worktrees & agents (`orca-cli` + `orchestration`)**: When running inside Orca (or the user asks to spawn Orca workers/worktrees), use **Section 2B (Orca Orchestration Mode)** below.
    - **Isolated parallel worktrees in T3 Code (separate branches/ports/DBs or cross-provider Claude/Codex)**: Use **Section 2A (T3 Code Worktree Mode)** below.
@@ -27,7 +28,7 @@ Coordinate parallel or large-scale `SPEC.md` execution (recommended coordinator:
 5. **Capability & Cost Guard**:
    - In T3 Code: call `orchestrator_capabilities` once to read actual available providers, models, and option keys/values (never hardcode unavailable options or switch providers unasked).
    - In Orca: run `ORCA agent installed --json` to verify valid `--agent` IDs (use `--environment local` when running locally).
-   - Warn the user before launching a wide parallel wave (4–5x quota burn) or `XHIGH` fan-out (cost curve: `low` 1x, `medium` 2.5x, `high` 5x, `xhigh` 8.6x — ~72% more than `high`; default coordinator/reviewer to **HIGH** and reserve **XHIGH** for stuck/high-risk gates), and suggest checking `/usage` before long runs.
+   - Warn the user before launching a wide parallel wave (4–5x quota burn) or `XHIGH` fan-out (cost curve: `low` 1x, `medium` 2.5x, `high` 5x, `xhigh` 8.6x — ~72% more than `high`; default coordinator/reviewer to **HIGH** and reserve **XHIGH** for stuck/high-risk gates), keep worker reports short and structured (worker output tokens dominate swarm cost), and suggest checking `/usage` before long runs.
    - Collect non-urgent items requiring user approval (paid installs, migrations, pushes, destructive actions) into **one batch list** instead of interrupting repeatedly.
 
 ## 2A. Spawn Parallel Workers — T3 Code Worktree Mode

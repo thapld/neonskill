@@ -24,7 +24,7 @@ Bootstrap a repo for the `neon-*` workflow (recommended model: **Gemini 4 Neon �
 3. **Create `DECISIONS.md`** (if missing):
    - Use a one-line log format: `- YYYY-MM-DD: <decision> — <why>`.
 4. **Optional `.agents/` scaffolding** (only if requested):
-   - `.agents/agents/<name>.md`: use the bundled `agents/verifier.md` for `/swarm` read-only verification; for custom agents, omit `tools:` or copy tool names **verbatim** (a mismatch can hang a subagent); default `commandExecutionPolicy: sandbox`.
+   - `.agents/agents/<name>.md`: use the bundled `agents/verifier.md` for `/swarm` read-only verification; for custom agents, omit `tools:` or copy tool names **verbatim** (a mismatch can hang a subagent); default `commandExecutionPolicy: sandbox`. Note that frontmatter `model:` only accepts tiers (`inherit`, `flash`, `pro`)—not specific model IDs like `gemini-4-neon` or `gemini-4-carbon`; pin specific models via the `/swarm` coordinator prompt or Members tab instead.
    - `.agents/rules/*.md`: every rule file **must** define a valid trigger (`always_on`, `model_decision`, `glob`, or `manual`) or it is silently ignored.
 5. **Hygiene check**:
    - Suggest adding `HANDOFF.md` (and `SPEC.md` if the team keeps specs out of git) to `.gitignore` if not already ignored.
