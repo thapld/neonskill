@@ -15,6 +15,7 @@ Bootstrap a repo for the `neon-*` workflow (recommended model: **Gemini 4 Neon Â
    - Include:
      - **Commands**: exact build, typecheck, lint, and `<TEST_CMD>`.
      - **Done Means**: `<TEST_CMD>` passes, new tests cover changes, and **no test is ever loosened or skipped** to pass. If the repo has a UI, note the headless E2E command and state that live browser checks (`preview_*` / `/browser` in T3 Code & Antigravity, or `orca-cli` embedded browser in Orca) run only when requested by the user or approved in `SPEC.md`.
+     - **Test & Scratch Hygiene**: keep all official tests in the repo's canonical test directories; run one-off probes, repros, or ad-hoc checks inline (`node -e`, `python3 -c`) or in `$TMPDIR` outside the repo (never inside the repo tree); enforce directory allowlisting via pre-commit/CI checks where practical instead of relying solely on prompt rules.
      - **Ownership** *(optional)*: map key directories/modules to owners or slice boundaries.
      - **Never-Touch Paths**: `.env*`, secrets, lockfiles, or DB migrations unless explicitly scoped.
      - **Autonomy Gates**: run routine read/edit/test steps without stopping; stop and ask before spend, destructive deletes, DB migrations, secrets/auth changes, push/deploy, or ambiguity that changes the goal.

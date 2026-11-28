@@ -8,8 +8,8 @@ description: Filter temporary working files, finalize docs (README, 3-line CHANG
 Deliver a verified diff following `AGENTS.md` (or `NEON.md`) rules (recommended model: **Gemini 4 Hydrogen · LOW/MEDIUM**, or **Neon · LOW**).
 
 1. **Pre-flight & clean staging**:
-   - Inspect `git status` and `git diff <base>...HEAD`.
-   - Exclude temporary working files (`HANDOFF.md`, and `SPEC.md` unless `AGENTS.md` or the user explicitly keeps specs in git). Never commit secrets or `.env*`.
+   - Inspect `git status --untracked-files=all` and `git diff <base>...HEAD`.
+   - Exclude temporary working files (`HANDOFF.md`, and `SPEC.md` unless `AGENTS.md` or the user explicitly keeps specs in git), and remove or exclude any stray unapproved files outside `Files Touched` / canonical repo paths (such as one-off probes, QA scripts, or debug artifacts) before staging explicit paths. Never commit secrets or `.env*`.
    - Run `<TEST_CMD>` one final time on the clean diff and capture actual output (at least the last 20 lines).
 2. **Final docs on final diff**:
    - Update `README.md` if user-facing setup, usage, or API changed.

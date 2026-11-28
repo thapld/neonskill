@@ -39,7 +39,7 @@ For each independent slice in the current wave, launch `delegate_task` with:
   - **GOAL**: one sentence for this slice (`<TEST_CMD>` passes + new test, matching `/goal` discipline).
   - **CONTEXT**: `AGENTS.md`/`NEON.md`, `DECISIONS.md`, `SPEC.md` section, exact files owned by this slice.
   - **DONE WHEN**: `<TEST_CMD>` passes and a new test covers the change.
-  - **DO NOT**: explicitly list off-limits files/directories, plus: *"Do the work yourself; do not start subagents; do not edit `HANDOFF.md`; no TODOs/stubs; never loosen or skip tests."*
+  - **DO NOT**: explicitly list off-limits files/directories, plus: *"Do the work yourself; do not start subagents; do not edit `HANDOFF.md`; no TODOs/stubs; never loosen or skip tests; run one-off probes/repros inline or in `$TMPDIR` (never inside the repo) and confirm `git status --untracked-files=all` leaves zero stray files outside owned paths."*
   - **RETURN**: changed files (`file:line`), **pasted test output** (at least last 20 lines, not summarized), branch/worktree info, and blockers/open doubts.
 
 ## 2B. Spawn Parallel Workers — Orca Orchestration Mode
@@ -54,6 +54,7 @@ Load Orca's `orchestration` guide (`ORCA skills get orchestration`) and resolve 
 ## 3. Verify Every Worker & Track State (Single-Writer `HANDOFF.md`)
 - Wait for all workers in the wave to complete (follow `next`; never poll).
 - Never trust an idle batch alone: inspect each worker's output individually (`worker-read` in Orca) for real passing `<TEST_CMD>`, new tests, and zero stub/test-loosening violations.
+- Verify `git status --untracked-files=all` in each worker's workspace contains zero stray files outside owned paths and canonical test directories before marking done or merging.
 - **Single-writer rule**: only the coordinator updates `HANDOFF.md` (kept untracked) after each wave with completed slices and any blockers (`what failed` + `next fix`). In Orca, also update the parent worktree card (`ORCA worktree set --worktree active --comment "<wave status>" --json`).
 - If a worker fails twice on the same assumption, step back and check whether `SPEC.md` is flawed (or escalate a hard isolated bug to `/boost`) before retrying.
 
