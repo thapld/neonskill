@@ -41,6 +41,6 @@ Plan before coding following `AGENTS.md` (or `NEON.md`) rules (recommended model
    - **Risks Ranked**: ordered high → low with mitigation.
    - **Test Plan**: exact `<TEST_CMD>`, new tests to add, and explicit opt-in if live browser/E2E verification is approved for UI work.
    - **What We Will NOT Do**: explicit out-of-scope boundaries.
-   - **Execution Mode & Slices/Phases**: disjoint files per parallel slice, dependencies, port/DB isolation if needed, and `DONE WHEN` per slice.
+   - **Execution Mode & Slices/Phases**: disjoint files per parallel slice, dependencies, port/DB isolation if needed, and `DONE WHEN` per slice. Default to vertical slices (`schema → API → UI → tests`), **except** for wide mechanical refactors with repo-wide blast radius where vertical slicing would break builds mid-wave — sequence those as **Expand → Migrate batches → Contract** (add new alongside old → migrate by directory/package keeping CI green → delete old once no callers remain).
 6. **Stop for approval**:
    - Present `SPEC.md` and wait for explicit user OK before writing any implementation code.

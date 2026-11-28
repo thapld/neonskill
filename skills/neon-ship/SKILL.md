@@ -18,9 +18,9 @@ Deliver a verified diff following `AGENTS.md` (or `NEON.md`) rules (recommended 
 3. **Commit, push & open Draft PR**:
    - Stage **explicit file paths** (never blind `git add .` / `git add -A`) and commit cleanly.
    - For multiline commit messages or PR bodies (especially in **Orca**), write to a file and pass `git commit -F <file>` / `gh pr create --body-file <file>` — never use heredocs (`<<`) or here-strings (`<<<`).
-   - Push the branch and open a **draft PR** (`pull_request_create` with `draft: true`, or `gh pr create --draft`) including the pasted test output and 3-line changelog summary.
+   - Push the branch and open a **draft PR** (`pull_request_create` with `draft: true`, or `gh pr create --draft`) including a **Merge-Danger Call** (`One-way door` e.g. DB migration / breaking API vs `Two-way door` / easily reversible, plus blast radius), the pasted test output, and the 3-line changelog summary.
    - Link the PR to your harness: in **T3 Code**, call `link_pull_request` right away if created via `gh` (`pull_request_create` links automatically); in **Orca**, attach it to the worktree (`orca worktree set --worktree active --pr <number> --workspace-status completed --json` or `orca reference add <pr-url> --worktree active --json`).
    - Never merge or push directly to `main` unless explicitly asked.
 4. **Post-PR optional follow-ups** (non-blocking — output after the Draft PR is opened; never modify files or reopen scope without approval):
-   - **`IMPROVE`**: name the single step that caused the most friction/retries in this run and propose **1 concrete tweak** to `AGENTS.md` (apply only if the user says yes).
+   - **`IMPROVE`**: name the single step that caused the most friction/retries in this run and classify it first — if **mechanical** (banned API, fixed pattern, import/file-location rule), propose **1 deterministic check** (lint rule, pre-commit hook, or CI check) instead of bloating `AGENTS.md`; reserve **`AGENTS.md`** tweaks strictly for judgment calls (apply only if the user says yes).
    - **`ITERATE`** *(for new features)*: briefly list up to **3 high-impact ideas for v2** from a first-time user's perspective, ready if the user chooses to iterate next.

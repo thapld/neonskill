@@ -108,7 +108,7 @@ Tự dò stack và lệnh test/lint/typecheck, tạo `AGENTS.md` tĩnh (được
 ```
 1. Đọc `AGENTS.md`, `DECISIONS.md`, code liên quan → xuất **Codebase Map (≤10 dòng)** + **Top 3 file rủi ro nhất (`path:line`)**.
 2. **Adaptive Grill Gate**: hỏi ngược lại bạn (có `(Recommended)` đứng đầu) trước khi viết `SPEC.md`. Với bài toán lớn/nhiều ngã rẽ, bạn có thể chạy thẳng `/grill-me` trước hoặc cùng `/plan`.
-3. Lưu quyết định vào `DECISIONS.md`, chọn mode chạy, xuất `SPEC.md` và **dừng chờ bạn duyệt**.
+3. Lưu quyết định vào `DECISIONS.md`, chọn mode chạy, xuất `SPEC.md` (mặc định vertical slice; dùng **Expand → Migrate → Contract** cho refactor rộng) và **dừng chờ bạn duyệt**.
 
 ### Bước 3: Phối hợp theo từng môi trường (Antigravity / T3 Code / Orca)
 
@@ -126,7 +126,7 @@ Tự dò stack và lệnh test/lint/typecheck, tạo `AGENTS.md` tĩnh (được
 ### Bước 4: Review, Sửa lỗi & Ship (`neon-review` → `neon-fix` → `neon-ship`)
 * `neon-review` mở **file test đầu tiên** (bắt lỗi nới lỏng/skip test), audit cả thay đổi đã commit lẫn chưa commit, chạy `<TEST_CMD>` (ưu tiên unit test logic thuần trước browser và tách nhiễu 404 `/favicon.ico` khỏi lỗi thật) và (nếu được bật trong `SPEC.md`) kiểm tra browser (`preview_*` / `/browser` hoặc `orca-cli` `snapshot`/`screenshot`); PR lớn có thể chia vai read-only (`@simplicity`, `@edge-cases`, `@security`, `@ux`).
 * `neon-fix` sửa severity 1–2 theo kiểu test-first (2-strike kiểm tra lại `SPEC.md` + gợi ý `/boost`, tối đa 3 vòng).
-* `neon-ship` lọc `HANDOFF.md`, cập nhật `README.md` + 3-line `CHANGELOG.md`, mở Draft PR (tránh heredoc `<<` / `<<<` bằng `--body-file`), tự gắn PR vào thread T3 Code hoặc Orca worktree (`orca worktree set --pr` / `orca reference add`), sau đó gợi ý tùy chọn `IMPROVE` và `ITERATE`.
+* `neon-ship` lọc `HANDOFF.md`, cập nhật `README.md` + 3-line `CHANGELOG.md`, mở Draft PR (kèm **Merge-Danger Call**, test output, tránh heredoc `<<` / `<<<` bằng `--body-file`), tự gắn PR vào thread T3 Code hoặc Orca worktree (`orca worktree set --pr` / `orca reference add`), sau đó gợi ý `IMPROVE` (ưu tiên lint/CI cho lỗi mechanical trước `AGENTS.md`) và `ITERATE`.
 
 ### Bước 5: Bảo toàn trạng thái (`neon-handoff`) & Thực hành tốt cho Gemini 4 Neon / `/swarm`
 * Khi gần chạm **512K context** trên Antigravity app hoặc giới hạn 5 giờ/tuần: ưu tiên `/compact`; nếu cần reset sạch thì chạy `neon-handoff` ở thread chính để ghi `HANDOFF.md`, sau đó `/clear` và nạp lại từ `AGENTS.md` + `DECISIONS.md` + `HANDOFF.md`.
